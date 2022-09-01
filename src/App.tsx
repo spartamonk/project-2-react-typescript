@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react'
+import { CartContainer, Navbar, Modal } from './state'
+import { calculateTotal } from './state'
+import { useTypedSelector, useAppDispatch } from './hooks'
+import { getCartItems } from './state'
 
 function App() {
+  const dispatch = useAppDispatch()
+  const { cartItems, isLoading } = useTypedSelector((store) => store.cart)
+  const { isOpen } = useTypedSelector((store) => store.modal)
+  useEffect(() => {
+    dispatch(getCartItems())
+  }, [])
+  useEffect(() => {
+    dispatch(calculateTotal())
+  }, [cartItems, dispatch])
+  if(isLoading){
+    return (
+      <div className='loading'>
+        <h1>Loading...</h1>
+      </div>
+    )
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <main>
+      {isOpen ? <Modal /> : null}
+      <Navbar />
+      <CartContainer />
+    </main>
+  )
 }
 
-export default App;
+export default App
